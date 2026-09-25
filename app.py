@@ -82,5 +82,9 @@ def delete_inquiry(iid):
 def export_csv():
     c=db(); rows=c.execute('SELECT * FROM inquiries ORDER BY id DESC').fetchall(); c.close(); out=io.StringIO(); w=csv.writer(out); w.writerow(['ID','Created','Trip Type','Starting','Destination','Travel Date','Duration','Travellers','Details','Name','Phone']); [w.writerow([r[k] for k in r.keys()]) for r in rows]; return Response(out.getvalue(),mimetype='text/csv',headers={'Content-Disposition':'attachment; filename=kings-tourism-inquiries.csv'})
 
+# Initialize the SQLite schema when the app is imported by Gunicorn on Render.
+# Without this, the first request can fail with 'no such table: visits'.
+init_db()
+
 if __name__=='__main__':
-    init_db(); app.run(debug=True,host='127.0.0.1',port=5000)
+    app.run(debug=True,host='127.0.0.1',port=5000)
